@@ -1,0 +1,23 @@
+{
+  "xsappname": "aucomwowzchatfs5",
+  "tenant-mode": "dedicated",
+  "description": "Security profile for aucomwowzchatfs5",
+  "authorities": [
+    "$ACCEPT_GRANTED_AUTHORITIES"
+  ],
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.User",
+      "description": "Use the PMR Chat UI"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "User",
+      "description": "PMR Chat UI user",
+      "scope-references": [
+        "$XSAPPNAME.User"
+      ]
+    }
+  ]
+}

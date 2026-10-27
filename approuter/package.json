@@ -1,0 +1,15 @@
+{
+  "name": "zchatfs5-approuter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone approuter for the zchatfs5 chatbot API proxy",
+  "scripts": {
+    "start": "node node_modules/@sap/approuter/approuter.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@sap/approuter": "^20.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "welcomeFile": "/",
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/chatbot-api/(.*)$",
+      "target": "/$1",
+      "destination": "PMR_CHATBOT_OAUTH2USTKNEX",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    }
+  ]
+}
