@@ -15,6 +15,23 @@
       "version": "1.33.0",
       "toolsId": "64a57813-ac60-452e-8a05-2bfc0bc4f90d"
     },
+    "dataSources": {
+      "forecastService": {
+        "uri": "/sap/opu/odata4/sap/zui_forecast_v4/srvd/sap/zc_fetching_forecast/0001/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0",
+          "localUri": "localService/metadata.xml"
+        }
+      },
+      "feedbackService": {
+        "uri": "/feedback-api/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    },
     "crossNavigation": {
       "inbounds": {
         "Shell-plugin": {
@@ -67,6 +84,18 @@
         "settings": {
           "bundleName": "au.com.wow.zchatfs5.i18n.i18n"
         }
+      },
+      "": {
+        "dataSource": "forecastService",
+        "type": "sap.ui.model.odata.v4.ODataModel",
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server"
+        }
+      },
+      "feedbackModel": {
+        "dataSource": "feedbackService",
+        "preload": true
       }
     },
     "resources": {

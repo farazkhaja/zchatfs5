@@ -67,23 +67,23 @@ sap.ui.define([
                 sAppInTable = sIntent;
             }
             
-            // const oModel = this.getModel();
-            // const oListBinding = oModel.bindList("/outagedowntime", null, null, [
-            //     new sap.ui.model.Filter("application", "EQ", sAppInTable)
-            // ]);
+            const oModel = this.getModel();
+            const oListBinding = oModel.bindList("/outagedowntime", null, null, [
+                new sap.ui.model.Filter("application", "EQ", sAppInTable)
+            ]);
             let bShowChatbot = false;
-            // oListBinding.requestContexts()
-            //     .then(aContexts => {
-            //         const aData = aContexts.map(c => c.getObject());
-            //         console.log("Outage result:", aData);
-            //         if (aData[0].application !== "" && (aData[0].message === undefined || aData[0].message === null || aData[0].message === "") && aData[0].show_chat !== false) {
-            //             //No downtime. Show the icon
-            //             bShowChatbot = true;
-            //         }
-            //         else {
-            //             //Downtime in progress. Do not show icon
-            //             bShowChatbot = false;
-            //         }
+            oListBinding.requestContexts()
+                .then(aContexts => {
+                    const aZpmrData = aContexts.map(c => c.getObject());
+                    console.log("Outage result:", aZpmrData);
+                    if (aZpmrData[0].application !== "" && (aZpmrData[0].message === undefined || aZpmrData[0].message === null || aZpmrData[0].message === "") && aZpmrData[0].show_chat !== false) {
+                        //No downtime. Show the icon
+                        bShowChatbot = true;
+                    }
+                    else {
+                        //Downtime in progress. Do not show icon
+                        bShowChatbot = false;
+                    }
 
                     var oButton = document.getElementById(
                         "woolworths-chatbot-button"
@@ -93,8 +93,8 @@ sap.ui.define([
                         "woolworths-chatbot-window"
                     );
 
-                    // if (bShowChatbot) {
-                        this._createChatbot();
+                    if (bShowChatbot) {
+                        this._createChatbot(aZpmrData);
 
                         oButton = document.getElementById(
                             "woolworths-chatbot-button"
@@ -103,17 +103,17 @@ sap.ui.define([
                         if (oButton && !(oWindow && oWindow.classList.contains("open"))) {
                             oButton.style.display = "flex";
                         }
-                    // }
-                    // else {
-                    //     if (oButton) {
-                    //         oButton.style.display = "none";
-                    //     }
+                    }
+                    else {
+                        if (oButton) {
+                            oButton.style.display = "none";
+                        }
 
-                    //     if (oWindow) {
-                    //         oWindow.classList.remove("open");
-                    //     }
-                    // }
-            // });
+                        if (oWindow) {
+                            oWindow.classList.remove("open");
+                        }
+                    }
+            });
 
             // Applications (Tile intents) for which chatbot is required
             // var aAllowedIntents = [
@@ -154,7 +154,7 @@ sap.ui.define([
         },
 
 
-            _createChatbot: function () {
+            _createChatbot: function (aZpmrData) {
                 // if (sap.ushell.Container.getUser().getFullName() !== 'Faraz Khaja') {
                 //     return;
                 // }
@@ -177,7 +177,7 @@ sap.ui.define([
                 const sLastName = sap.ushell.Container.getUser().getLastName() || "";
 
                 const sInitials = (sFirstName.charAt(0) + sLastName.charAt(0)).toUpperCase();
-                this._createChatbotWindow(sInitials);
+                this._createChatbotWindow(sInitials, aZpmrData);
             },
 
             _loadCSS: function () {
@@ -207,13 +207,13 @@ sap.ui.define([
                         src="${sap.ui.require.toUrl(
                             "au/com/wow/zchatfs5/icons/Lime_Profile.png"
                         )}"
-                        alt="Open Lime5"
+                        alt="Open Lime."
                         class="woolworths-chatbot-button-icon"
                         draggable="false"
                     />
                 `;
 
-                oButton.title = "Open Lime5";
+                oButton.title = "Open Lime";
 
                 oButton.addEventListener("click", function () {
                     if (oButton.dataset.dragged === "true") {
@@ -222,6 +222,40 @@ sap.ui.define([
 
                     that._toggleChatbot();
                 });
+                //Open new window instead of opening the cha
+                // oButton.addEventListener("click", function () {
+                //     if (oButton.dataset.dragged === "true") {
+                //         return;
+                //     }
+                //     var sUrl =
+                //         "https://woolworths-group-limited-wowretaildev-dev-zchatfs1-approuter.cfapps.ap20.hana.ondemand.com/index.html";
+                //     var iWidth = 450;
+                //     var iHeight = 650;
+                //     var iLeft = Math.max(
+                //         0,
+                //         window.screen.width - iWidth - 30
+                //     );
+                //     var iTop = Math.max(
+                //         0,
+                //         window.screen.height - iHeight - 100
+                //     );
+                //     var oPopup = window.open(
+                //         sUrl,
+                //         "PMRChatWindow",
+                //         "width=" + iWidth +
+                //         ",height=" + iHeight +
+                //         ",left=" + iLeft +
+                //         ",top=" + iTop +
+                //         ",resizable=yes,scrollbars=yes"
+                //     );
+                //     if (!oPopup) {
+                //         // Popup blocked: fall back to a new tab.
+                //         window.open(sUrl, "_blank");
+                //     }
+                // });
+                
+
+
 
                 document.body.appendChild(oButton);
                 
@@ -304,9 +338,10 @@ sap.ui.define([
 
             },
 
-            _createChatbotWindow: function (sInitials) {
+            _createChatbotWindow: function (sInitials, aZpmrData) {
 
                 this._sUserInitials = sInitials || "You";
+                this._aZpmrData = aZpmrData || [];
 
                 var oWindow =
                     document.createElement("div");
@@ -361,7 +396,7 @@ sap.ui.define([
                             />
 
                             <div class="woolworths-chatbot-message-assistant">
-                                Hi, I am Lime5.<br><br>
+                                Hi, I am Lime.<br><br>
                                 I am your training chatbot and will assist you with training material loaded in SAP Central.<br><br>
                                 Please ask me anything related to Promotions Portal; I will answer it.
                             </div>
@@ -486,69 +521,145 @@ sap.ui.define([
 
                 oInput.value = "";
 
-                // User message on the right
-                this._addMessage(sQuestion, "user");
+                var aZpmrData = this._aZpmrData || [];
+                // Display the user's question
+                this._addMessage(sQuestion, "user", "", "");
+
+                // Show the thinking indicator below the question
+                var sThinkingId = this._showThinkingIndicator();
 
                 try {
-                    // await this.onTestDirectChatbotCall();
-                    var oResponse = await this._askChatbot(sQuestion);
+                    var oResponse = await this._askChatbot(sQuestion, aZpmrData);
 
-                    // Assistant response on the left
+                    // Remove the thinking indicator
+                    this._removeThinkingIndicator(sThinkingId);
+
+                    // Display Lime's response
                     this._addMessage(
                         oResponse.answer || "I couldn't generate a response.",
-                        "Lime"
+                        "Lime",
+                        oResponse.sources || [],
+                        oResponse.interactionId
                     );
+
                 } catch (oError) {
                     console.error("Chatbot error", oError);
 
+                    // Remove the thinking indicator
+                    this._removeThinkingIndicator(sThinkingId);
+
+                    // Display the error message
                     this._addMessage(
                         "Sorry, something went wrong.",
-                        "Lime"
+                        "Lime",
+                        ""
                     );
                 }
             },
+            
+            // _addMessage: function (sText, sSender) {
+            //     var oMessages = document.getElementById(
+            //         "woolworths-chatbot-messages"
+            //     );
 
+            //     var oMessageRow = document.createElement("div");
+            //     var bIsUser = sSender === "user";
+
+            //     oMessageRow.className =
+            //         "woolworths-chatbot-message-row " +
+            //         (bIsUser ? "user-row" : "assistant-row");
+
+            //     // User initials avatar on the right
+            //     if (bIsUser) {
+            //         var oAvatar = document.createElement("div");
+
+            //         oAvatar.className =
+            //             "woolworths-chatbot-user-avatar";
+
+            //         oAvatar.textContent =
+            //             this._sUserInitials || "U";
+
+            //         oMessageRow.appendChild(oAvatar);
+            //     } else {
+            //         // Lime icon on the left
+            //         var oAvatar = document.createElement("img");
+
+            //         oAvatar.className =
+            //             "woolworths-chatbot-message-avatar";
+
+            //         oAvatar.src = sap.ui.require.toUrl(
+            //             "au/com/wow/zchatfs5/icons/Lime_Bubble.png"
+            //         );
+
+            //         oAvatar.alt = "Lime";
+
+            //         oMessageRow.appendChild(oAvatar);
+            //     }
+
+            //     // Create a wrapper for the message and feedback
+            //     var oContent = document.createElement("div");
+
+            //     oContent.className = bIsUser
+            //         ? "woolworths-chatbot-user-content"
+            //         : "woolworths-chatbot-assistant-content";
+
+            //     // Message bubble
+            //     var oMessage = document.createElement("div");
+
+            //     oMessage.className =
+            //         "woolworths-chatbot-message " +
+            //         (bIsUser ? "user" : "assistant");
+
+            //     // Safely display message text
+            //     oMessage.textContent = sText;
+
+            //     oContent.appendChild(oMessage);
+
+            //     oMessageRow.appendChild(oContent);
+            //     oMessages.appendChild(oMessageRow);
+
+            //     // Scroll to the latest message
+            //     oMessages.scrollTop = oMessages.scrollHeight;
+            // },
             
-            
-            _addMessage: function (sText, sSender) {
+            _addMessage: function (sText, sSender, aSources, sInteractionId) {
                 var oMessages = document.getElementById(
                     "woolworths-chatbot-messages"
                 );
 
                 var oMessageRow = document.createElement("div");
-
                 var bIsUser = sSender === "user";
 
                 oMessageRow.className =
                     "woolworths-chatbot-message-row " +
                     (bIsUser ? "user-row" : "assistant-row");
 
-                // User initials avatar on the right
+                // Avatar
                 if (bIsUser) {
                     var oAvatar = document.createElement("div");
 
-                    oAvatar.className =
-                        "woolworths-chatbot-user-avatar";
-
-                    oAvatar.textContent =
-                        this._sUserInitials || "U";
+                    oAvatar.className = "woolworths-chatbot-user-avatar";
+                    oAvatar.textContent = this._sUserInitials || "U";
 
                     oMessageRow.appendChild(oAvatar);
                 } else {
-                    // Lime icon on the left
                     var oAvatar = document.createElement("img");
 
-                    oAvatar.className =
-                        "woolworths-chatbot-message-avatar";
-
+                    oAvatar.className = "woolworths-chatbot-message-avatar";
                     oAvatar.src = sap.ui.require.toUrl(
                         "au/com/wow/zchatfs5/icons/Lime_Bubble.png"
                     );
-
                     oAvatar.alt = "Lime";
 
                     oMessageRow.appendChild(oAvatar);
                 }
+
+                // Message content wrapper
+                var oContent = document.createElement("div");
+
+                oContent.className = bIsUser
+                    ? "woolworths-chatbot-user-content"
+                    : "woolworths-chatbot-assistant-content";
 
                 // Message bubble
                 var oMessage = document.createElement("div");
@@ -557,30 +668,219 @@ sap.ui.define([
                     "woolworths-chatbot-message " +
                     (bIsUser ? "user" : "assistant");
 
-                // Safely display message text
                 oMessage.textContent = sText;
+                oContent.appendChild(oMessage);
 
-                oMessageRow.appendChild(oMessage);
+                // Add sources
+                if (!bIsUser && Array.isArray(aSources) && aSources.length > 0) {
+                    var oSources = document.createElement("div");
+                    oSources.className = "woolworths-chatbot-sources";
+
+                    var oSourcesTitle = document.createElement("div");
+                    oSourcesTitle.className = "woolworths-chatbot-sources-title";
+                    oSourcesTitle.textContent = "Sources";
+
+                    oSources.appendChild(oSourcesTitle);
+
+                    var oSourceList = document.createElement("ul");
+
+                    aSources.forEach(function (oSource) {
+                        if (!oSource.filename || !oSource.url) {
+                            return;
+                        }
+
+                        var oListItem = document.createElement("li");
+                        var oLink = document.createElement("a");
+
+                        oLink.textContent = oSource.filename;
+                        oLink.href = oSource.url;
+                        oLink.target = "_blank";
+                        oLink.rel = "noopener noreferrer";
+
+                        oListItem.appendChild(oLink);
+                        oSourceList.appendChild(oListItem);
+                    });
+
+                    oSources.appendChild(oSourceList);
+                    oContent.appendChild(oSources);
+                }
+
+
+                // Add feedback only to Lime's responses
+                if (!bIsUser) {
+                    var oFeedback = document.createElement("div");
+
+                    oFeedback.className = "woolworths-chatbot-feedback";
+                    oFeedback.setAttribute("role", "group");
+                    oFeedback.setAttribute(
+                        "aria-label",
+                        "Rate Lime's response"
+                    );
+
+                    oContent.appendChild(oFeedback);
+
+                    var oThumbUp = new sap.ui.core.Icon({
+                        src: "sap-icon://thumb-up",
+                        size: "1rem",
+                        decorative: false,
+                        tooltip: "Helpful",
+                        useIconTooltip: true,
+                        press: function () {
+                            selectFeedback(oThumbUp, oThumbDown, "up", sInteractionId);
+                        }
+                    });
+
+                    var oThumbDown = new sap.ui.core.Icon({
+                        src: "sap-icon://thumb-down",
+                        size: "1rem",
+                        decorative: false,
+                        tooltip: "Not helpful",
+                        useIconTooltip: true,
+                        press: function () {
+                            selectFeedback(oThumbDown, oThumbUp, "down", sInteractionId);
+                        }
+                    });
+
+                    oThumbUp.addStyleClass(
+                        "woolworths-chatbot-feedback-icon"
+                    );
+
+                    oThumbDown.addStyleClass(
+                        "woolworths-chatbot-feedback-icon"
+                    );
+
+                    var that = this;
+                    // Track the selected rating for this response
+                    function selectFeedback(oSelected, oOther, sRating, sInteractionId) {
+                        oSelected.addStyleClass("feedback-selected");
+                        oOther.removeStyleClass("feedback-selected");
+
+                        // Store the selection on this response's feedback area
+                        oFeedback.dataset.rating = sRating;
+
+                        console.log("Lime feedback:", sRating);
+
+                        // Submit feedback to the backend
+                        that._submitFeedback(sInteractionId, sRating, "", "");
+                    }
+
+                    // Render SAPUI5 Icon controls into the feedback container
+                    oThumbUp.placeAt(oFeedback);
+                    oThumbDown.placeAt(oFeedback);
+                }
+
+                oMessageRow.appendChild(oContent);
                 oMessages.appendChild(oMessageRow);
 
                 // Scroll to the latest message
                 oMessages.scrollTop = oMessages.scrollHeight;
             },
 
+            _submitFeedback: async function (
+                sInteractionId,
+                sRating,
+                sReasonCode,
+                sComment
+            ) {
+                try {
+                    var oModel = this.getModel("feedbackModel");
+
+                    if (!oModel) {
+                        throw new Error("Feedback OData model is not configured.");
+                    }
+
+                    var oAction = oModel.bindContext("/submitFeedback(...)");
+
+                    oAction.setParameter("interactionId", sInteractionId);
+                    oAction.setParameter("rating", sRating);
+                    oAction.setParameter("reasonCode", sReasonCode || "");
+                    oAction.setParameter("comment", sComment || "");
+
+                    await oAction.execute();
+                    sap.m.MessageToast.show("Feedback submitted successfully.");
+
+                } catch (oError) {
+                    console.error("Failed to submit feedback:", oError);
+                    sap.m.MessageToast.show("Failed to submit feedback.");
+                }
+            },
+
+            _showThinkingIndicator: function () {
+                var oMessages = document.getElementById(
+                    "woolworths-chatbot-messages"
+                );
+
+                var sThinkingId = "woolworths-chatbot-thinking-" +
+                    Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+
+                // Create the message row
+                var oRow = document.createElement("div");
+
+                oRow.id = sThinkingId;
+
+                oRow.className =
+                    "woolworths-chatbot-message-row assistant-row";
+
+                // Add Lime's avatar
+                var oAvatar = document.createElement("img");
+
+                oAvatar.className =
+                    "woolworths-chatbot-message-avatar";
+
+                oAvatar.src = sap.ui.require.toUrl(
+                    "au/com/wow/zchatfs5/icons/Lime_Bubble.png"
+                );
+
+                oAvatar.alt = "Lime";
+
+                oRow.appendChild(oAvatar);
+
+                // Create the animated thinking bubble
+                var oThinking = document.createElement("div");
+
+                oThinking.className = "woolworths-chatbot-thinking";
+
+                oThinking.setAttribute("role", "status");
+                oThinking.setAttribute("aria-label", "Lime is thinking");
+
+                oThinking.innerHTML =
+                    '<span></span><span></span><span></span>';
+
+                oRow.appendChild(oThinking);
+
+                // Insert below the user's question
+                oMessages.appendChild(oRow);
+
+                // Scroll to the latest message
+                oMessages.scrollTop = oMessages.scrollHeight;
+
+                return sThinkingId;
+            },
+
+            _removeThinkingIndicator: function (sThinkingId) {
+                var oThinking = document.getElementById(sThinkingId);
+
+                if (oThinking) {
+                    oThinking.remove();
+                }
+            },
             _askChatbot: async function (
-                sQuestion
+                sQuestion, aZpmrData
             ) {
 
                 var oPayload = {
-                    userId: "1390664", //sUserId,
+                    userId: aZpmrData[0].user_id, //sUserId,
                     sessionId: "101", //sSessionId,
-                    salesOrg: "1005", //sSalesOrg,
-                    currentScreen: "ViewPlan", //sCurrentScreen,
+                    salesOrg: "", // aZpmrData has no sales org
+                    currentScreen: "", // determine application and screen?,
                     message: sQuestion,
                     clear: false
                 };
             
-                const oResponse = await fetch("/chatbot-api/api/v1/chat", {
+            const sAppPath = sap.ui.require.toUrl("au/com/wow/zchatfs5");
+            const sUrl = sAppPath + "/chatbot-api/api/v1/chat";
+                // const oResponse = await fetch("/chatbot-api/api/v1/chat", {
+                const oResponse = await fetch(sUrl, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -600,7 +900,16 @@ sap.ui.define([
                         " - " + sResponseBody
                     );
                 }
-                debugger;
+
+                // debugger;
+                // Parse the JSON returned by the API
+                const oResult = JSON.parse(sResponseBody);
+                // Return the API response in a consistent format
+                return {
+                    answer: oResult.response,
+                    sources: oResult.sources || [],
+                    interactionId: oResult.interactionId || "0000000000"
+                };
             },
 
             exit: function () {
