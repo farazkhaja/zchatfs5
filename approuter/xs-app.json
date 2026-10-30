@@ -8,6 +8,13 @@
       "destination": "PMR_CHATBOT_OAUTH2USTKNEX",
       "authenticationType": "xsuaa",
       "csrfProtection": false
-    }
+    },
+   {
+      "source": "^/feedback-api/(.*)$",
+      "target": "/api/feedback/$1",
+      "destination": "PMR_CHATBOT_FDBACK_OAUTH2USTKNEX",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    }    
   ]
 }

@@ -420,7 +420,7 @@
 
 
 
-.woolworths-chatbot-sources {
+/* .woolworths-chatbot-sources {
     margin-top: 12px;
     padding: 12px 14px;
     background: #f5f6f7;
@@ -455,4 +455,75 @@
 .woolworths-chatbot-sources a:hover {
     color: #116b32;
     cursor: pointer;
+} */
+
+/* Sources container */
+.woolworths-chatbot-sources {
+    margin-top: 12px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Sources heading */
+.woolworths-chatbot-sources-toggle {
+    background-color: #E8F5E9;
+    color: #263238;
+    cursor: pointer;
+    padding: 10px 14px;
+    width: 100%;
+    border: none;
+    border-radius: 6px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Hover */
+.woolworths-chatbot-sources-toggle:hover {
+    background-color: #D7EEDB;
+}
+
+/* Arrow */
+.woolworths-chatbot-sources-arrow {
+    font-size: 11px;
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+}
+
+/* Expanded content */
+.woolworths-chatbot-sources-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease-out;
+    background-color: #F7FBF7;
+    border-radius: 0 0 6px 6px;
+}
+
+/* Source list */
+.woolworths-chatbot-sources-content ul {
+    margin: 0;
+    padding: 10px 14px 10px 30px;
+}
+
+/* Individual source */
+.woolworths-chatbot-sources-content li {
+    padding: 4px 0;
+    font-size: 12px;
+    color: #333;
+}
+
+/* Source links */
+.woolworths-chatbot-sources-content a {
+    color: #0070F2;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.woolworths-chatbot-sources-content a:hover {
+    color: #0056B3;
+    text-decoration: underline;
 }

@@ -95,7 +95,12 @@
       },
       "feedbackModel": {
         "dataSource": "feedbackService",
-        "preload": true
+        "type": "sap.ui.model.odata.v4.ODataModel",
+        "preload": true,
+        "settings": {
+            "synchronizationMode": "None",
+            "operationMode": "Server"
+        }
       }
     },
     "resources": {
