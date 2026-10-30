@@ -266,6 +266,8 @@
     min-width: 0;
     box-sizing: border-box;
     overflow-wrap: anywhere;
+
+    white-space-collapse: collapse;
 }
 
 /* Message row */
