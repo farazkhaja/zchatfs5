@@ -84,8 +84,9 @@
     font-weight: 600;
 }
 
-/* Minimize and Close buttons in chatbot header */
+/* Minimize, Maximize and Close buttons in chatbot header */
 .woolworths-chatbot-minimize,
+.woolworths-chatbot-maximize,
 .woolworths-chatbot-close {
     border: none;
     background: transparent;
@@ -107,12 +108,14 @@
 
 /* Hover effect */
 .woolworths-chatbot-minimize:hover,
+.woolworths-chatbot-maximize:hover,
 .woolworths-chatbot-close:hover {
     background: rgba(0, 0, 0, 0.08);
 }
 
 /* Keyboard focus accessibility */
 .woolworths-chatbot-minimize:focus-visible,
+.woolworths-chatbot-maximize:focus-visible,
 .woolworths-chatbot-close:focus-visible {
     outline: 2px solid #006B38;
     outline-offset: 2px;
@@ -526,4 +529,54 @@
 .woolworths-chatbot-sources-content a:hover {
     color: #0056B3;
     text-decoration: underline;
+}
+
+
+
+
+/* Maximised chatbot window */
+#woolworths-chatbot-window.maximized {
+    position: fixed;
+
+    width: 60vw;
+    height: 60vh;
+
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+
+    transform: translate(-50%, -50%);
+
+    max-width: 1100px;
+    max-height: 850px;
+
+    min-width: 500px;
+    min-height: 400px;
+
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+/* Keep header controls aligned */
+.woolworths-chatbot-maximize {
+    border: none;
+    background: transparent;
+    color: inherit;
+
+    font-size: 21px;
+    line-height: 1;
+
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+    flex-shrink: 0;
 }

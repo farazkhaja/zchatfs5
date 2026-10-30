@@ -385,6 +385,14 @@ sap.ui.define([
                         </button>
 
                         <button
+                            id="woolworths-chatbot-maximize"
+                            class="woolworths-chatbot-maximize"
+                            title="Maximise"
+                            aria-label="Maximise chatbot">
+                            ⛶
+                        </button>
+
+                        <button
                             id="woolworths-chatbot-close"
                             class="woolworths-chatbot-close"
                             title="Close"
@@ -443,6 +451,13 @@ sap.ui.define([
                 .addEventListener(
                     "click",
                     this._minimizeChatbot.bind(this)
+                );
+
+                document
+                .getElementById("woolworths-chatbot-maximize")
+                .addEventListener(
+                    "click",
+                    this._toggleMaximizeChatbot.bind(this)
                 );
 
                 document
@@ -513,6 +528,37 @@ sap.ui.define([
 
                 if (oButton) {
                     oButton.style.display = "flex";
+                }
+            },
+
+            _toggleMaximizeChatbot: function () {
+
+                var oWindow = document.getElementById(
+                    "woolworths-chatbot-window"
+                );
+
+                var oButton = document.getElementById(
+                    "woolworths-chatbot-maximize"
+                );
+
+                if (!oWindow || !oButton) {
+                    return;
+                }
+
+                var bIsMaximized = oWindow.classList.toggle("maximized");
+
+                if (bIsMaximized) {
+
+                    oButton.innerHTML = "❐";
+                    oButton.title = "Restore";
+                    oButton.setAttribute("aria-label", "Restore chatbot");
+
+                } else {
+
+                    oButton.innerHTML = "⛶";
+                    oButton.title = "Maximise";
+                    oButton.setAttribute("aria-label", "Maximise chatbot");
+
                 }
             },
 
