@@ -41,9 +41,6 @@ sap.ui.define([
         },
 
         _handleNavigation: function () {
-            // if (!this._bChatbotUserAllowed) {
-            //     return;
-            // }
 
             var sHash = window.location.hash || "";
 
@@ -64,21 +61,27 @@ sap.ui.define([
                 }
                 return;
             }
-
+            const INTENT_MAP = {
+                "LoyaltyPlanning-manage": "LYLTYPLN",
+                "LoyaltyCampMgm-manage": "LYLTYCMP",
+                "calendar01-list": "CALENDAR",
+                "promotion_report-report": "CMPROMOREP",
+                "cm_smry_rpt-list": "CMSUM-REP",
+                "dealsoffersreview-list": "DEALOFRREV",
+                "dealsearch-list": "DEALREPORT",
+                "LoyaltyPlanningSupp-supp": "LYLTYPLNVN",
+                "massupldofrdl01-list": "MASDEALOFR",
+                "massuploadtactics01-list": "MASTACTICS",
+                "offerconstructreport-list": "OFRCONSREP",
+                "offersearchreport-list": "OFRSRRPT",
+                "productcustomgroup-list": "PORTFOL-CG",
+                "productreport-list": "PORTFOLIO",
+                "unactionedDealsReport-list": "UNACTDLREP",
+                "report-list": "VENDORREPO"
+            };
             let sAppInTable = "";
-            if (sIntent === "LoyaltyPlanning-manage") {
-                sAppInTable = "LYLTYPLN";
-            }
-            else if (sIntent === "LoyaltyCampMgm-manage") {
-                sAppInTable = "LYLTYCMP";
-            }
-            else if (sIntent === "calendar01-list") {
-                sAppInTable = "CALENDAR";
-            }
-            else {
-                sAppInTable = sIntent;
-            }
-            
+            sAppInTable = INTENT_MAP[sIntent] || sIntent;
+
             const oModel = this.getModel();
             const oListBinding = oModel.bindList("/outagedowntime", null, null, [
                 new sap.ui.model.Filter("application", "EQ", sAppInTable)
@@ -126,43 +129,6 @@ sap.ui.define([
                         }
                     }
             });
-
-            // Applications (Tile intents) for which chatbot is required
-            // var aAllowedIntents = [
-            //     "calendar01-list",
-            //     "LoyaltyPlanning-manage",
-            //     "LoyaltyCampMgm-manage"
-            // ];
-
-            // // var bShowChatbot = aAllowedIntents.includes(sIntent);
-
-            // var oButton = document.getElementById(
-            //     "woolworths-chatbot-button"
-            // );
-
-            // var oWindow = document.getElementById(
-            //     "woolworths-chatbot-window"
-            // );
-
-            // if (bShowChatbot) {
-            //     this._createChatbot();
-
-            //     oButton = document.getElementById(
-            //         "woolworths-chatbot-button"
-            //     );
-
-            //     if (oButton && !(oWindow && oWindow.classList.contains("open"))) {
-            //         oButton.style.display = "flex";
-            //     }
-            // } else {
-            //     if (oButton) {
-            //         oButton.style.display = "none";
-            //     }
-
-            //     if (oWindow) {
-            //         oWindow.classList.remove("open");
-            //     }
-            // }
         },
 
 
@@ -234,40 +200,6 @@ sap.ui.define([
 
                     that._toggleChatbot();
                 });
-                //Open new window instead of opening the cha
-                // oButton.addEventListener("click", function () {
-                //     if (oButton.dataset.dragged === "true") {
-                //         return;
-                //     }
-                //     var sUrl =
-                //         "https://woolworths-group-limited-wowretaildev-dev-zchatfs1-approuter.cfapps.ap20.hana.ondemand.com/index.html";
-                //     var iWidth = 450;
-                //     var iHeight = 650;
-                //     var iLeft = Math.max(
-                //         0,
-                //         window.screen.width - iWidth - 30
-                //     );
-                //     var iTop = Math.max(
-                //         0,
-                //         window.screen.height - iHeight - 100
-                //     );
-                //     var oPopup = window.open(
-                //         sUrl,
-                //         "PMRChatWindow",
-                //         "width=" + iWidth +
-                //         ",height=" + iHeight +
-                //         ",left=" + iLeft +
-                //         ",top=" + iTop +
-                //         ",resizable=yes,scrollbars=yes"
-                //     );
-                //     if (!oPopup) {
-                //         // Popup blocked: fall back to a new tab.
-                //         window.open(sUrl, "_blank");
-                //     }
-                // });
-                
-
-
 
                 document.body.appendChild(oButton);
                 
@@ -599,20 +531,35 @@ sap.ui.define([
                         oResponse.sources || [],
                         oResponse.interactionId
                     );
-
                 } catch (oError) {
                     console.error("Chatbot error", oError);
 
                     // Remove the thinking indicator
                     this._removeThinkingIndicator(sThinkingId);
 
-                    // Display the error message
+                    // Extract the actual error message
+                    var sErrorMessage = oError.message || "Sorry, something went wrong.";
+
+                    // Extract JSON detail if the error contains an HTTP response body
+                    var oMatch = sErrorMessage.match(/HTTP \d+ - (\{.*\})/);
+
+                    if (oMatch) {
+                        try {
+                            var oErrorResponse = JSON.parse(oMatch[1]);
+                            sErrorMessage = oErrorResponse.detail || sErrorMessage;
+                        } catch (e) {
+                            // Keep the original error message if parsing fails
+                        }
+                    }
+
+                    // Display the actual error message
                     this._addMessage(
-                        "Sorry, something went wrong.",
+                        sErrorMessage,
                         "Lime",
-                        ""
+                        []
                     );
-                }
+
+                    }
             },
             
             _addMessage: function (sText, sSender, aSources, sInteractionId) {
@@ -761,7 +708,7 @@ sap.ui.define([
                         tooltip: "Helpful",
                         useIconTooltip: true,
                         press: function () {
-                            selectFeedback(oThumbUp, oThumbDown, "up", sInteractionId);
+                            selectFeedback(oThumbUp, oThumbDown, "UP", sInteractionId);
                         }
                     });
 
@@ -772,7 +719,7 @@ sap.ui.define([
                         tooltip: "Not helpful",
                         useIconTooltip: true,
                         press: function () {
-                            selectFeedback(oThumbDown, oThumbUp, "down", sInteractionId);
+                            selectFeedback(oThumbDown, oThumbUp, "DOWN", sInteractionId);
                         }
                     });
 
@@ -972,9 +919,8 @@ sap.ui.define([
                     clear: false
                 };
             
-            const sAppPath = sap.ui.require.toUrl("au/com/wow/zchatfs5");
-            const sUrl = sAppPath + "/chatbot-api/api/v1/chat";
-                // const oResponse = await fetch("/chatbot-api/api/v1/chat", {
+                const sAppPath = sap.ui.require.toUrl("au/com/wow/zchatfs5");
+                const sUrl = sAppPath + "/chatbot-api/api/v1/chat";
                 const oResponse = await fetch(sUrl, {
                     method: "POST",
                     headers: {
@@ -996,7 +942,6 @@ sap.ui.define([
                     );
                 }
 
-                // debugger;
                 // Parse the JSON returned by the API
                 const oResult = JSON.parse(sResponseBody);
                 // Return the API response in a consistent format
